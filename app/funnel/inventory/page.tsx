@@ -176,22 +176,20 @@ function FurnitureSelector({
           return (
             <div
               key={item.id}
-              className={`p-4 rounded-xl border-2 transition-all ${
+              className={`p-3 rounded-xl border-2 transition-all ${
                 isSelected
                   ? 'border-primary bg-primary/5'
                   : 'border-border'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-base font-medium">{item.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <span className="text-xl flex-shrink-0">{item.icon}</span>
+                <span className="text-sm font-medium flex-1 min-w-0 truncate">{item.name}</span>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     onClick={() => updateCount(item, -1)}
                     disabled={count === 0}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-lg font-medium transition-all ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-base font-medium transition-all ${
                       count === 0
                         ? 'bg-muted text-muted-foreground cursor-not-allowed'
                         : 'bg-primary/10 text-primary hover:bg-primary/20'
@@ -199,12 +197,12 @@ function FurnitureSelector({
                   >
                     -
                   </button>
-                  <span className={`w-8 text-center font-bold text-lg ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <span className={`w-6 text-center font-bold text-base ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
                     {count}
                   </span>
                   <button
                     onClick={() => updateCount(item, 1)}
-                    className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-lg font-medium hover:bg-[#15803d] transition-all"
+                    className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-base font-medium hover:bg-[#15803d] transition-all"
                   >
                     +
                   </button>
