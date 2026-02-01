@@ -29,10 +29,12 @@ export default function LandingPage() {
       <header className="bg-white border-b border-border">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-white text-lg">🚚</span>
-            </div>
-            <span className="font-semibold text-lg text-foreground">MovePlan</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/MovIQ Logo.png"
+              alt="MovIQ"
+              className="h-9 w-auto object-contain"
+            />
           </div>
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 text-muted-foreground">
@@ -112,10 +114,12 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <span className="text-lg">🚚</span>
-              </div>
-              <span className="text-sm text-muted-foreground">MovePlan Demo</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/MovIQ Logo.png"
+                alt="MovIQ"
+                className="h-7 w-auto object-contain opacity-70"
+              />
             </div>
             <p className="text-xs text-muted-foreground text-center md:text-right max-w-md">
               This is a demo lead generation funnel. No actual moving services are provided.
@@ -123,7 +127,7 @@ export default function LandingPage() {
           </div>
           <div className="divider my-6" />
           <p className="text-xs text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} MovePlan Demo. All rights reserved.
+            &copy; {new Date().getFullYear()} MovIQ. All rights reserved.
           </p>
         </div>
       </footer>

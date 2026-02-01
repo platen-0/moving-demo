@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MovePlan — Plan Your Move, Get Movers Competing",
+  title: "MovIQ — Plan Your Move, Get Movers Competing",
   description: "Build your move plan in minutes. Get competing quotes from top-rated movers. Keep your plan forever, whether you book or not.",
 };
 
