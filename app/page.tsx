@@ -27,13 +27,13 @@ export default function LandingPage() {
 
       {/* Header - not fixed, scrolls with page */}
       <header className="bg-white border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/MovIQ Logo.png"
               alt="MovIQ"
-              className="h-9 w-auto object-contain"
+              className="h-24 sm:h-32 w-auto object-contain"
             />
           </div>
           <div className="flex items-center gap-4">
