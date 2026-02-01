@@ -7,7 +7,7 @@ interface ProgressBarProps {
   progress: number;
 }
 
-const STEP_ORDER = ['basics', 'inventory', 'special-items', 'services', 'summary', 'contact', 'quotes'];
+const STEP_ORDER = ['basics', 'inventory', 'special-items', 'location', 'services', 'summary', 'contact', 'quotes'];
 
 export function ProgressBar({ currentStep, progress }: ProgressBarProps) {
   const stepInfo = STEP_CONFIG[currentStep];
