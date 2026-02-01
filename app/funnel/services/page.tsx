@@ -1,10 +1,101 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMove } from '@/context/MoveContext';
 import { Button } from '@/components/ui/button';
+import { useConfetti } from '@/components/gamification/CelebrationConfetti';
 import type { AdditionalService } from '@/types';
+
+// Service level configurations
+interface ServiceLevel {
+  name: string;
+  icon: string;
+  description: string;
+  stressLevel: number;
+  timeHours: number;
+  features: string[];
+  notIncluded: string[];
+  popular?: boolean;
+  recommended?: boolean;
+}
+
+const SERVICE_LEVELS: Record<string, ServiceLevel> = {
+  diy: {
+    name: 'DIY Move',
+    icon: '🏋️',
+    description: 'You pack, we move',
+    stressLevel: 85,
+    timeHours: 20,
+    features: ['Loading & unloading', 'Transport only', 'Basic protection'],
+    notIncluded: ['Packing materials', 'Packing labor', 'Unpacking'],
+  },
+  partial: {
+    name: 'Partial Service',
+    icon: '🤝',
+    description: 'We pack fragiles, you pack the rest',
+    stressLevel: 50,
+    timeHours: 10,
+    popular: true,
+    features: ['Fragile item packing', 'Loading & unloading', 'Basic unpacking'],
+    notIncluded: ['Full packing', 'Complete unpacking'],
+  },
+  full: {
+    name: 'Full Service',
+    icon: '✨',
+    description: 'We handle everything',
+    stressLevel: 15,
+    timeHours: 2,
+    recommended: true,
+    features: ['Complete packing', 'All materials included', 'Full unpacking', 'Debris removal'],
+    notIncluded: [],
+  },
+};
+
+// Stress meter component
+function StressMeter({ level, label }: { level: number; label: string }) {
+  const getColor = (level: number) => {
+    if (level <= 30) return 'bg-emerald-500';
+    if (level <= 60) return 'bg-amber-500';
+    return 'bg-red-500';
+  };
+
+  const getEmoji = (level: number) => {
+    if (level <= 30) return '😌';
+    if (level <= 60) return '😐';
+    return '😰';
+  };
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">{label}</span>
+        <span>{getEmoji(level)}</span>
+      </div>
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${getColor(level)}`}
+          style={{ width: `${level}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Time saved calculator
+function TimeSavedBadge({ hours }: { hours: number }) {
+  if (hours <= 0) return null;
+  return (
+    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+      <span>⏰</span>
+      <span>Get {hours}+ hours back</span>
+    </div>
+  );
+}
+
+// Popular service IDs
+const POPULAR_SERVICES = ['packing', 'storage'];
+const RECOMMENDED_SERVICES = ['packing'];
 
 function ServiceCard({
   service,
@@ -15,14 +106,33 @@ function ServiceCard({
   onToggle: () => void;
   onToggleSubOption?: (subOptionId: string) => void;
 }) {
+  const isPopular = POPULAR_SERVICES.includes(service.id);
+  const isRecommended = RECOMMENDED_SERVICES.includes(service.id);
+
   return (
     <div
-      className={`p-5 rounded-xl border-2 transition-all ${
+      className={`relative p-5 rounded-xl border-2 transition-all ${
         service.selected
-          ? 'border-primary bg-primary/5'
+          ? isRecommended
+            ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-green-50 shadow-lg shadow-emerald-100'
+            : 'border-primary bg-primary/5'
           : 'border-border hover:border-primary/50'
       }`}
     >
+      {/* Popular badge */}
+      {isPopular && !service.selected && (
+        <div className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full">
+          ⭐ Most Popular
+        </div>
+      )}
+
+      {/* Recommended badge */}
+      {isRecommended && service.selected && (
+        <div className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full animate-pulse">
+          ✓ Great Choice!
+        </div>
+      )}
+
       <div className="flex items-start gap-4">
         <button
           onClick={onToggle}
@@ -43,7 +153,14 @@ function ServiceCard({
           <button onClick={onToggle} className="text-left w-full">
             <div className="flex items-start justify-between">
               <div>
-                <div className="font-semibold text-foreground">{service.name}</div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-foreground">{service.name}</span>
+                  {isPopular && (
+                    <span className="text-xs px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-medium">
+                      85% choose this
+                    </span>
+                  )}
+                </div>
                 <div className="text-sm text-muted-foreground mt-0.5">{service.description}</div>
               </div>
               <div className="text-right">
@@ -92,10 +209,62 @@ export default function ServicesPage() {
   const router = useRouter();
   const { state, toggleService, toggleServiceSuboption, completeStep } = useMove();
   const [mounted, setMounted] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<'diy' | 'partial' | 'full' | null>(null);
+  const { fire: fireConfetti } = useConfetti();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Calculate stress level based on selected services
+  const stressReduction = useMemo(() => {
+    const hasPackingService = state.services.find(s => s.id === 'packing')?.selected;
+    const hasUnpackingService = state.services.find(s => s.id === 'unpacking')?.selected;
+    const hasCleaningService = state.services.find(s => s.id === 'cleaning')?.selected;
+
+    let reduction = 0;
+    if (hasPackingService) reduction += 35;
+    if (hasUnpackingService) reduction += 20;
+    if (hasCleaningService) reduction += 15;
+
+    return Math.min(reduction, 70);
+  }, [state.services]);
+
+  // Calculate time saved
+  const timeSaved = useMemo(() => {
+    let hours = 0;
+    state.services.forEach(s => {
+      if (s.selected) {
+        if (s.id === 'packing') hours += 12;
+        if (s.id === 'unpacking') hours += 6;
+        if (s.id === 'cleaning') hours += 4;
+        if (s.id === 'disassembly') hours += 3;
+      }
+    });
+    return hours;
+  }, [state.services]);
+
+  // Handle service level selection
+  const handleLevelSelect = useCallback((level: 'diy' | 'partial' | 'full') => {
+    setSelectedLevel(level);
+
+    // Auto-select relevant services based on level
+    const packingService = state.services.find(s => s.id === 'packing');
+    const unpackingService = state.services.find(s => s.id === 'unpacking');
+
+    if (level === 'full') {
+      if (packingService && !packingService.selected) toggleService('packing');
+      if (unpackingService && !unpackingService.selected) toggleService('unpacking');
+      fireConfetti('milestone');
+    } else if (level === 'partial') {
+      if (packingService && !packingService.selected) toggleService('packing');
+      if (unpackingService && unpackingService.selected) toggleService('unpacking');
+    } else {
+      // DIY - deselect packing services
+      if (packingService && packingService.selected) toggleService('packing');
+      if (unpackingService && unpackingService.selected) toggleService('unpacking');
+    }
+  }, [state.services, toggleService, fireConfetti]);
 
   const selectedServices = state.services.filter((s) => s.selected);
   const serviceCost = useMemo(() => {
@@ -178,22 +347,78 @@ export default function ServicesPage() {
           </p>
         </div>
 
-        {/* Popular recommendation */}
-        <div className={`mb-6 p-4 rounded-xl bg-primary/5 border border-primary/20 ${mounted ? 'fade-in-up stagger-1' : 'opacity-0'}`}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Most popular choice</p>
-              <p className="text-sm text-muted-foreground">
-                85% of customers choose Full Packing Service
-              </p>
-            </div>
+        {/* Service Level Comparison */}
+        <div className={`mb-8 ${mounted ? 'fade-in-up stagger-1' : 'opacity-0'}`}>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Choose your service level</h2>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {Object.entries(SERVICE_LEVELS).map(([key, level]) => (
+              <button
+                key={key}
+                onClick={() => handleLevelSelect(key as 'diy' | 'partial' | 'full')}
+                className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                  selectedLevel === key
+                    ? level.recommended
+                      ? 'border-emerald-500 bg-emerald-50 shadow-lg'
+                      : 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                {level.recommended && (
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full whitespace-nowrap">
+                    ✨ Recommended
+                  </div>
+                )}
+                {level.popular && !level.recommended && (
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full whitespace-nowrap">
+                    ⭐ Popular
+                  </div>
+                )}
+                <div className="text-center mb-3">
+                  <span className="text-3xl">{level.icon}</span>
+                  <h3 className="font-semibold text-foreground mt-2">{level.name}</h3>
+                  <p className="text-xs text-muted-foreground">{level.description}</p>
+                </div>
+                <div className="space-y-3">
+                  <StressMeter level={level.stressLevel} label="Your stress level" />
+                  <div className="text-center">
+                    <TimeSavedBadge hours={20 - level.timeHours} />
+                  </div>
+                </div>
+                <ul className="mt-3 space-y-1">
+                  {level.features.slice(0, 3).map((feature, i) => (
+                    <li key={i} className="flex items-center gap-1.5 text-xs text-emerald-700">
+                      <span>✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Stress Reduction Indicator */}
+        {stressReduction > 0 && (
+          <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">😌</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-emerald-900">Stress reduced by {stressReduction}%</span>
+                  {timeSaved > 0 && <TimeSavedBadge hours={timeSaved} />}
+                </div>
+                <div className="h-2 bg-emerald-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 to-green-500 rounded-full transition-all duration-500"
+                    style={{ width: `${stressReduction}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Services List */}
         <div className={`space-y-4 ${mounted ? 'fade-in-up stagger-2' : 'opacity-0'}`}>
@@ -207,9 +432,9 @@ export default function ServicesPage() {
           ))}
         </div>
 
-        {/* Cost Summary */}
+        {/* Cost Summary with Bundle Discount */}
         {selectedServices.length > 0 && (
-          <div className={`mt-8 p-4 rounded-xl bg-muted/50 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>
+          <div className={`mt-8 p-5 rounded-xl bg-gradient-to-br from-primary/5 to-emerald-50 border border-primary/20 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-foreground">
@@ -218,8 +443,20 @@ export default function ServicesPage() {
                 <p className="text-sm text-muted-foreground">
                   Added to your quote requests
                 </p>
+                {/* Bundle discount indicator */}
+                {selectedServices.length >= 2 && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                    <span>🎁</span>
+                    <span>Bundle discount applied! (Save 10%)</span>
+                  </div>
+                )}
               </div>
               <div className="text-right">
+                {selectedServices.length >= 2 && (
+                  <div className="text-sm text-muted-foreground line-through">
+                    ~${Math.round(serviceCost * 1.1).toLocaleString()}
+                  </div>
+                )}
                 <div className="text-2xl font-serif text-primary">
                   ~${Math.round(serviceCost).toLocaleString()}
                 </div>

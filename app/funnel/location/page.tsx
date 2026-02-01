@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMove } from '@/context/MoveContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useConfetti } from '@/components/gamification/CelebrationConfetti';
 import dynamic from 'next/dynamic';
 
 // Dynamically import Google Maps components to avoid SSR issues
@@ -73,8 +74,11 @@ export default function LocationPage() {
 
   const [routeDistance, setRouteDistance] = useState<number | null>(state.basics.routeInfo?.distance || null);
   const [routeDuration, setRouteDuration] = useState<number | null>(state.basics.routeInfo?.duration || null);
+  const [hasShownRouteConfetti, setHasShownRouteConfetti] = useState(false);
+  const [showDateTip, setShowDateTip] = useState(false);
 
   const [mounted, setMounted] = useState(false);
+  const { fire: fireConfetti } = useConfetti();
 
   useEffect(() => {
     setMounted(true);
@@ -107,7 +111,12 @@ export default function LocationPage() {
   const handleRouteCalculated = useCallback((distance: number, duration: number) => {
     setRouteDistance(distance);
     setRouteDuration(duration);
-  }, []);
+    // Fire confetti when route is first calculated
+    if (!hasShownRouteConfetti) {
+      setHasShownRouteConfetti(true);
+      fireConfetti('room-complete');
+    }
+  }, [hasShownRouteConfetti, fireConfetti]);
 
   // Calculate estimated cost including distance
   const estimatedCost = useMemo(() => {
@@ -253,7 +262,12 @@ export default function LocationPage() {
                   type="date"
                   value={moveDate}
                   min={today}
-                  onChange={(e) => setMoveDate(e.target.value)}
+                  onChange={(e) => {
+                    setMoveDate(e.target.value);
+                    if (e.target.value && !showDateTip) {
+                      setShowDateTip(true);
+                    }
+                  }}
                   className="h-14 text-lg flex-1"
                 />
                 <label className="flex items-center gap-3 cursor-pointer px-5 py-3 rounded-xl border border-border hover:bg-muted transition-colors">
@@ -266,6 +280,24 @@ export default function LocationPage() {
                   <span className="text-lg text-foreground">I&apos;m flexible</span>
                 </label>
               </div>
+
+              {/* Smart Date Tip */}
+              {moveDate && (
+                <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-3">
+                  <span className="text-xl">💡</span>
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">
+                      Pro tip: Tuesdays & Wednesdays are typically 15-20% cheaper!
+                    </p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      {new Date(moveDate).getDay() === 2 || new Date(moveDate).getDay() === 3
+                        ? "Great choice! You picked a budget-friendly day 💰"
+                        : "Consider a mid-week move to save on your quote"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {!moveDate && (
                 <p className="text-base text-muted-foreground mt-3">
                   Don&apos;t know yet? No problem — you can skip this.
