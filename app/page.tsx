@@ -28,13 +28,12 @@ export default function LandingPage() {
       {/* Header - not fixed, scrolls with page */}
       <header className="bg-white border-b border-border overflow-visible relative z-10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 h-12 overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/MovIQ Logo.png"
               alt="MovIQ"
-              className="h-28 sm:h-36 w-auto object-contain -my-6"
-              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+              className="h-[200px] w-auto object-cover object-center scale-[2.5] origin-center"
             />
           </div>
           <div className="flex items-center gap-4">
