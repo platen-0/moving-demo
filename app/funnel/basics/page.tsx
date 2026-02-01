@@ -236,42 +236,42 @@ export default function BasicsPage() {
         </div>
       )}
 
-      <div className="flex-1 w-full max-w-7xl mx-auto px-8 py-8 lg:py-12">
+      <div className="flex-1 w-full max-w-7xl mx-auto px-8 py-4 lg:py-6">
         {/* Header */}
-        <div className={`text-center mb-10 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>
-          <h1 className="font-serif text-4xl lg:text-5xl text-foreground mb-4">
+        <div className={`text-center mb-6 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>
+          <h1 className="font-serif text-3xl lg:text-4xl text-foreground mb-2">
             What does your home look like?
           </h1>
-          <p className="text-xl lg:text-2xl text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             Add and remove rooms to match your space
           </p>
         </div>
 
         {/* Room Selection Grid */}
-        <div className={`mb-10 ${mounted ? 'fade-in-up stagger-1' : 'opacity-0'}`}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+        <div className={`mb-6 ${mounted ? 'fade-in-up stagger-1' : 'opacity-0'}`}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {ROOM_TYPES.map((room) => {
               const count = roomCounts[room.type] || 0;
               const isActive = count > 0;
               return (
                 <div
                   key={room.type}
-                  className={`relative p-6 rounded-2xl border-2 transition-all ${
+                  className={`relative p-4 rounded-xl border-2 transition-all ${
                     isActive
                       ? 'border-primary bg-primary/5 shadow-md'
                       : 'border-border bg-white hover:border-primary/30'
                   }`}
                 >
-                  <div className="text-center mb-4">
-                    <span className="text-5xl">{room.icon}</span>
-                    <p className="font-semibold text-xl text-foreground mt-3">{room.name}</p>
+                  <div className="text-center mb-2">
+                    <span className="text-3xl">{room.icon}</span>
+                    <p className="font-semibold text-sm text-foreground mt-1">{room.name}</p>
                   </div>
 
-                  <div className="flex items-center justify-center gap-3">
+                  <div className="flex items-center justify-center gap-2">
                     <button
                       onClick={() => updateRoomCount(room.type, -1)}
                       disabled={count === 0}
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold transition-all ${
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-bold transition-all ${
                         count === 0
                           ? 'bg-muted text-muted-foreground cursor-not-allowed'
                           : 'bg-primary/10 text-primary hover:bg-primary/20'
@@ -279,12 +279,12 @@ export default function BasicsPage() {
                     >
                       -
                     </button>
-                    <span className={`text-3xl font-bold w-10 text-center ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                    <span className={`text-2xl font-bold w-8 text-center ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
                       {count}
                     </span>
                     <button
                       onClick={() => updateRoomCount(room.type, 1)}
-                      className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold hover:bg-[#15803d] transition-all"
+                      className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold hover:bg-[#15803d] transition-all"
                     >
                       +
                     </button>
@@ -297,16 +297,16 @@ export default function BasicsPage() {
 
         {/* Home Size Context Card */}
         {totalRooms > 0 && (
-          <div className={`mb-8 p-5 rounded-xl bg-blue-50 border border-blue-200 ${mounted ? 'fade-in-up stagger-2' : 'opacity-0'}`}>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-2xl">🏠</span>
+          <div className={`mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 ${mounted ? 'fade-in-up stagger-2' : 'opacity-0'}`}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <span className="text-xl">🏠</span>
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-lg text-foreground">
+                <p className="font-semibold text-base text-foreground">
                   {homeSizeInfo.description} typically has {homeSizeInfo.typicalBoxes}
                 </p>
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   We&apos;ll count yours exactly in the next step
                 </p>
               </div>
@@ -319,95 +319,95 @@ export default function BasicsPage() {
 
         {/* Box Estimation Card */}
         {totalRooms > 0 && (
-          <div className={`p-8 rounded-2xl bg-white border-2 border-border shadow-sm ${mounted ? 'fade-in-up stagger-3' : 'opacity-0'}`}>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                <span className="text-3xl">📦</span>
+          <div className={`p-4 rounded-xl bg-white border-2 border-border shadow-sm ${mounted ? 'fade-in-up stagger-3' : 'opacity-0'}`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                <span className="text-xl">📦</span>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold text-foreground">Estimated Boxes & Weight</h3>
-                <p className="text-lg text-muted-foreground">Adjust if you think you&apos;ll need more or less</p>
+                <h3 className="text-lg font-semibold text-foreground">Estimated Boxes & Weight</h3>
+                <p className="text-sm text-muted-foreground">Adjust if you think you&apos;ll need more or less</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-3 gap-4 mb-4">
               {/* Small Boxes */}
-              <div className="text-center p-5 rounded-xl bg-muted/50">
-                <p className="text-base font-medium text-muted-foreground mb-2">Small Boxes</p>
-                <p className="text-sm text-muted-foreground mb-4">Books, heavy items</p>
-                <div className="flex items-center justify-center gap-3">
+              <div className="text-center p-3 rounded-lg bg-muted/50">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Small Boxes</p>
+                <p className="text-xs text-muted-foreground mb-2">Books, heavy items</p>
+                <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={() => updateBoxCount('small', -1)}
-                    className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-lg"
+                    className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-base"
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold text-foreground w-12 text-center">{boxes.small}</span>
+                  <span className="text-2xl font-bold text-foreground w-10 text-center">{boxes.small}</span>
                   <button
                     onClick={() => updateBoxCount('small', 1)}
-                    className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-lg"
+                    className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-base"
                   >
                     +
                   </button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">{boxes.small * BOX_WEIGHTS.small} lbs</p>
+                <p className="text-xs text-muted-foreground mt-2">{boxes.small * BOX_WEIGHTS.small} lbs</p>
               </div>
 
               {/* Medium Boxes */}
-              <div className="text-center p-5 rounded-xl bg-muted/50">
-                <p className="text-base font-medium text-muted-foreground mb-2">Medium Boxes</p>
-                <p className="text-sm text-muted-foreground mb-4">General items</p>
-                <div className="flex items-center justify-center gap-3">
+              <div className="text-center p-3 rounded-lg bg-muted/50">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Medium Boxes</p>
+                <p className="text-xs text-muted-foreground mb-2">General items</p>
+                <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={() => updateBoxCount('medium', -1)}
-                    className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-lg"
+                    className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-base"
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold text-foreground w-12 text-center">{boxes.medium}</span>
+                  <span className="text-2xl font-bold text-foreground w-10 text-center">{boxes.medium}</span>
                   <button
                     onClick={() => updateBoxCount('medium', 1)}
-                    className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-lg"
+                    className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-base"
                   >
                     +
                   </button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">{boxes.medium * BOX_WEIGHTS.medium} lbs</p>
+                <p className="text-xs text-muted-foreground mt-2">{boxes.medium * BOX_WEIGHTS.medium} lbs</p>
               </div>
 
               {/* Large Boxes */}
-              <div className="text-center p-5 rounded-xl bg-muted/50">
-                <p className="text-base font-medium text-muted-foreground mb-2">Large Boxes</p>
-                <p className="text-sm text-muted-foreground mb-4">Light, bulky items</p>
-                <div className="flex items-center justify-center gap-3">
+              <div className="text-center p-3 rounded-lg bg-muted/50">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Large Boxes</p>
+                <p className="text-xs text-muted-foreground mb-2">Light, bulky items</p>
+                <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={() => updateBoxCount('large', -1)}
-                    className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-lg"
+                    className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-base"
                   >
                     -
                   </button>
-                  <span className="text-3xl font-bold text-foreground w-12 text-center">{boxes.large}</span>
+                  <span className="text-2xl font-bold text-foreground w-10 text-center">{boxes.large}</span>
                   <button
                     onClick={() => updateBoxCount('large', 1)}
-                    className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-lg"
+                    className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center hover:bg-muted text-base"
                   >
                     +
                   </button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">{boxes.large * BOX_WEIGHTS.large} lbs</p>
+                <p className="text-xs text-muted-foreground mt-2">{boxes.large * BOX_WEIGHTS.large} lbs</p>
               </div>
             </div>
 
             {/* Totals */}
-            <div className="flex items-center justify-center gap-12 pt-6 border-t border-border">
+            <div className="flex items-center justify-center gap-8 pt-4 border-t border-border">
               <div className="text-center">
-                <p className="text-4xl font-bold text-primary">{totalBoxes}</p>
-                <p className="text-base text-muted-foreground">Total Boxes</p>
+                <p className="text-3xl font-bold text-primary">{totalBoxes}</p>
+                <p className="text-sm text-muted-foreground">Total Boxes</p>
               </div>
-              <div className="w-px h-14 bg-border" />
+              <div className="w-px h-10 bg-border" />
               <div className="text-center">
-                <p className="text-4xl font-bold text-primary">{totalWeight.toLocaleString()}</p>
-                <p className="text-base text-muted-foreground">Est. lbs</p>
+                <p className="text-3xl font-bold text-primary">{totalWeight.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Est. lbs</p>
               </div>
             </div>
           </div>
