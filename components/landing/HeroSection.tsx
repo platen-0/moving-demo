@@ -257,7 +257,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/50" />
 
-      <div className="relative w-full max-w-7xl mx-auto px-8 py-8 lg:py-12">
+      <div className="relative w-full max-w-7xl mx-auto px-8 py-4 lg:py-6">
         <div className="max-w-5xl mx-auto text-center">
           {/* Trust badges row */}
           <div className={`flex flex-wrap items-center justify-center gap-3 mb-8 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>

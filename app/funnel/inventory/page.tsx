@@ -182,10 +182,10 @@ function FurnitureSelector({
                   : 'border-border'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <span className="text-xl flex-shrink-0">{item.icon}</span>
-                <span className="text-sm font-medium flex-1 min-w-0 truncate">{item.name}</span>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <span className="text-sm font-medium flex-1 min-w-0 leading-tight">{item.name}</span>
+                <div className="flex items-center gap-1 flex-shrink-0">
                   <button
                     onClick={() => updateCount(item, -1)}
                     disabled={count === 0}
